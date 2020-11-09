@@ -32,7 +32,7 @@ namespace RestoranMain
 
         }
         //Metoda koja sluzi za ispis dana u izabranom mesecu
-        static DateTime Rezervacija(out int UnetiSto)
+        static (DateTime,int) Rezervacija()
         {
 
             //deklaracija promenljivih
@@ -40,7 +40,7 @@ namespace RestoranMain
             int UnetaGodina;//UnetaGodina - godina u kojoj korisnik zeli da napravi rezervaciju
             int UnetiDan;//UnetiDan - dan kojeg korisnik zeli da napravi rezervaciju
             int UnetoVreme;//UnetoVreme - deo dana u kom korisnik zeli da napravi rezervaciju
-            //UnetiSto - sto za kojim korisnik zeli da napravi rezervaciju
+            int UnetiSto;//UnetiSto - sto za kojim korisnik zeli da napravi rezervaciju
             DateTime TrenutnoVremeIDatum = DateTime.Now; //Promenljiva koja sadrži trenutno vreme i datum
             
             string[] MeseciUGodini = {
@@ -185,14 +185,37 @@ namespace RestoranMain
             //Petlja koja se ponavlja sve dok korisnik ne potvrdi da je uneo zeljeni sto
             DateTime IzabranoVremeIDatum=new DateTime(UnetaGodina,UnetiMesec,UnetiDan,UnetoVreme, 0, 0);
             //Datum i vreme kada korisnik želi da napravi rezervaciju
-            return IzabranoVremeIDatum;
+            return (IzabranoVremeIDatum, UnetiSto);
         }
         static void Main(string[] args)
         {
-            int a=0;
-            DateTime datum = Rezervacija(out a);
-            Console.WriteLine(datum);
-
+            (DateTime, int)[] NizRezervacija = new (DateTime, int)[0];
+            int IzborRezervacija;
+            while (true)
+            {
+                Console.WriteLine("Ako želite da pogledate spisak rezervacija unesite 1, ako želite da napravite novu rezervaciju unesite 2: ");
+                while (!int.TryParse(Console.ReadLine(), out IzborRezervacija) || IzborRezervacija > 2 || IzborRezervacija < 1)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Pogrešan unos. Trebate uneti 1 ili 2. Pokušajte ponovo: ");
+                    Console.WriteLine("Ako želite da pogledate spisak rezervacija unesite 1, ako želite da napravite novu rezervaciju unesite 2: ");
+                }
+                if (IzborRezervacija == 1)
+                {
+                    Console.Clear();
+                    Array.Sort(NizRezervacija);
+                    for (int i = 0; i < NizRezervacija.Length; i++)
+                        Console.WriteLine((i + 1) + ". Datum i vreme: " + NizRezervacija[i].Item1 + " Sto: " + NizRezervacija[i].Item2);
+                }
+                else
+                {
+                    Console.Clear();
+                    Array.Resize(ref NizRezervacija, NizRezervacija.Length + 1);
+                    NizRezervacija[NizRezervacija.Length-1] = Rezervacija();
+                    
+                }
+            }
+            
         }
     }
 }
