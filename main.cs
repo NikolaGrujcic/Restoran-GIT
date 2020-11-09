@@ -32,7 +32,7 @@ namespace RestoranMain
 
         }
         //Metoda koja sluzi za ispis dana u izabranom mesecu
-        static (DateTime,int) Rezervacija()
+        static (DateTime,int) Rezervacija(ref (DateTime, int)[] NizRezervacija)
         {
 
             //deklaracija promenljivih
@@ -138,7 +138,10 @@ namespace RestoranMain
                         "\n2-Želite da napravite rezervaciju u 18 časova");
                     Console.WriteLine("Pogrešan unos. Trebate uneti 1 ili 2. Pokušajte ponovo: ");
                 }
-                if (UnetoVreme == 1) UnetoVreme = 14;
+                if (UnetoVreme == 1)
+                {
+                    UnetoVreme = 14;
+                }
                 else UnetoVreme = 18;
                 Console.WriteLine("Da li ste sigurni da želite da napravite rezervaciju u mesecu "
                 + MeseciUGodini[UnetiMesec - 1]
@@ -178,17 +181,26 @@ namespace RestoranMain
                 Console.WriteLine("1-Da\n2-Izabrali ste pogrešan sto\n3-Ne želite da napravite rezervaciju\n4-Želite da napravite rezervaciju ispočetka");
                 while (!int.TryParse(Console.ReadLine(), out KorisnikJeSiguran) || KorisnikJeSiguran > 3 || KorisnikJeSiguran < 1)
                     Console.WriteLine("Pogrešan unos. Trebate uneti broj od 1 do 4. Pokušajte ponovo: ");
-                if (KorisnikJeSiguran == 3) ;//treba dodati goto koji ide nazad u glavni program
+                if (KorisnikJeSiguran == 3);//treba dodati goto koji ide nazad u glavni program
                 if (KorisnikJeSiguran == 4) goto PocetakRezervacije;// vraca se na unos meseca
                 Console.Clear();
             } while (!Convert.ToBoolean(KorisnikJeSiguran - 2));
             //Petlja koja se ponavlja sve dok korisnik ne potvrdi da je uneo zeljeni sto
             DateTime IzabranoVremeIDatum=new DateTime(UnetaGodina,UnetiMesec,UnetiDan,UnetoVreme, 0, 0);
             //Datum i vreme kada korisnik želi da napravi rezervaciju
+            if(TrenutnoVremeIDatum>IzabranoVremeIDatum)
+            {
+                Console.WriteLine("To vreme je već prošlo. Unesite 1 ako želite da izmenite rezervaciju ili 2 ako ne želite da pravite rezervaciju");
+                while (!int.TryParse(Console.ReadLine(), out KorisnikJeSiguran) || KorisnikJeSiguran > 3 || KorisnikJeSiguran < 1)
+                    Console.WriteLine("Pogrešan unos. Trebate uneti 1 ili 2. Pokušajte ponovo: ");
+                //Treba dodati proveru da li je vec rezervisano
+            }
+            Array.Resize(ref NizRezervacija, NizRezervacija.Length + 1);
             return (IzabranoVremeIDatum, UnetiSto);
         }
         static void Main(string[] args)
         {
+            Meni:
             (DateTime, int)[] NizRezervacija = new (DateTime, int)[0];
             int IzborRezervacija;
             while (true)
@@ -210,8 +222,7 @@ namespace RestoranMain
                 else
                 {
                     Console.Clear();
-                    Array.Resize(ref NizRezervacija, NizRezervacija.Length + 1);
-                    NizRezervacija[NizRezervacija.Length-1] = Rezervacija();
+                    NizRezervacija[NizRezervacija.Length-1] = Rezervacija(ref NizRezervacija);
                     
                 }
             }
