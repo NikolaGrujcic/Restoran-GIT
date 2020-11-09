@@ -15,6 +15,7 @@ namespace RestoranMain
             }
             Console.ForegroundColor = ConsoleColor.White;
         }
+        //Metoda koja sluzi za ispis meseci u godini
         static void IspisDana(DateTime TrenutnoVremeIDatum, int UnetiMesec, int UnetaGodina)
         {
             for (int i = 1; i <= System.DateTime.DaysInMonth(UnetaGodina, UnetiMesec); i++)
@@ -30,6 +31,7 @@ namespace RestoranMain
             Console.ForegroundColor = ConsoleColor.White;
 
         }
+        //Metoda koja sluzi za ispis dana u izabranom mesecu
         static DateTime Rezervacija(out int UnetiSto)
         {
 
@@ -190,7 +192,7 @@ namespace RestoranMain
             int a=0;
             DateTime datum = Rezervacija(out a);
             Console.WriteLine(datum);
-            
+
         }
     }
 }
