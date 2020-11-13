@@ -4,6 +4,18 @@ namespace RestoranMain
 {
     class Program
     {
+        static void IzbaciRezervacijeKojeSuProsle(ref (DateTime, int)[] NizRezervacija)
+        {
+            for (int i = 0; i < NizRezervacija.Length; i++)
+            {
+                if(NizRezervacija[i].Item1<=DateTime.Now)
+                {
+                    for (int j = i; j < NizRezervacija.Length - 1; i++) NizRezervacija[j] = NizRezervacija[j + 1];
+                    Array.Resize(ref NizRezervacija, NizRezervacija.Length - 1);
+                }
+            }
+        }
+        //Metodom kojom se izbacuju sve rezervacije iz proslosti
         static void IspisMeseci(string[] MeseciUGodini, DateTime TrenutnoVremeIDatum)
         {
             Console.ForegroundColor = ConsoleColor.DarkYellow;
@@ -143,7 +155,9 @@ namespace RestoranMain
                     UnetoVreme = 14;
                 }
                 else UnetoVreme = 18;
-                Console.WriteLine("Da li ste sigurni da želite da napravite rezervaciju u mesecu "
+                Console.WriteLine("Da li ste sigurni da želite da napravite rezervaciju "
+                + UnetiDan
+                + ". dana u mesecu "
                 + MeseciUGodini[UnetiMesec - 1]
                 + " "
                 + UnetaGodina
@@ -168,7 +182,9 @@ namespace RestoranMain
                     Console.WriteLine("Pogrešan unos. Trebate uneti broj od 1 do 5. Pokušajte ponovo: ");
                     Console.WriteLine("Unesite broj stola koji želite da rezervišete. Ima ih 5:");
                 }
-                Console.WriteLine("Da li ste sigurni da želite da napravite rezervaciju u mesecu "
+                Console.WriteLine("Da li ste sigurni da želite da napravite rezervaciju "
+                + UnetiDan
+                + ". dana u mesecu "
                 + MeseciUGodini[UnetiMesec - 1]
                 + " "
                 + UnetaGodina
@@ -193,8 +209,21 @@ namespace RestoranMain
                 Console.WriteLine("To vreme je već prošlo. Unesite 1 ako želite da izmenite rezervaciju ili 2 ako ne želite da pravite rezervaciju");
                 while (!int.TryParse(Console.ReadLine(), out KorisnikJeSiguran) || KorisnikJeSiguran > 3 || KorisnikJeSiguran < 1)
                     Console.WriteLine("Pogrešan unos. Trebate uneti 1 ili 2. Pokušajte ponovo: ");
-                //Treba dodati proveru da li je vec rezervisano
+                if (KorisnikJeSiguran == 1) goto PocetakRezervacije;
+                else return;
             }
+            for(int i=0;i<NizRezervacija.Length;i++)
+            {
+                if(NizRezervacija[i]==(IzabranoVremeIDatum,UnetiSto))
+                {
+                    Console.WriteLine("Ta rezervacija nije dostupna. Unesite 1 ako želite da izmenite rezervaciju ili 2 ako ne želite da pravite rezervaciju");
+                    while (!int.TryParse(Console.ReadLine(), out KorisnikJeSiguran) || KorisnikJeSiguran > 3 || KorisnikJeSiguran < 1)
+                        Console.WriteLine("Pogrešan unos. Trebate uneti 1 ili 2. Pokušajte ponovo: ");
+                    if (KorisnikJeSiguran == 1) goto PocetakRezervacije;
+                    else return;
+                }
+            }
+            //Petlja koja proverava da li rezervacija već postoji
             Array.Resize(ref NizRezervacija, NizRezervacija.Length + 1);
             NizRezervacija[NizRezervacija.Length-1] = (IzabranoVremeIDatum, UnetiSto);
         }
@@ -215,12 +244,13 @@ namespace RestoranMain
                 }
                 if (IzborRezervacija == 1)
                 {
+                    IzbaciRezervacijeKojeSuProsle(ref NizRezervacija);
                     Console.Clear();
                     if (NizRezervacija.Length == 0) Console.WriteLine("Nema rezervacija.");
                     Array.Sort(NizRezervacija);
                     for (int i = 0; i < NizRezervacija.Length; i++)
                         Console.WriteLine((i + 1) 
-                            + ". Datum i vreme: " + NizRezervacija[i].Item1 
+                            + ". Datum i vreme: " + NizRezervacija[i].Item1
                             + " Sto: " + NizRezervacija[i].Item2);
                 }
                 else
