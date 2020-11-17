@@ -4,14 +4,19 @@ namespace RestoranMain
 {
     class Program
     {
-        static void IzbaciRezervacijeKojeSuProsle(ref (DateTime, int)[] NizRezervacija)
+        static void IzbaciRezervacijeKojeSuProsle(ref DateTime[] NizRezervacija, ref int[] NizRezervacijaStolovi)
         {
             for (int i = 0; i < NizRezervacija.Length; i++)
             {
-                if(NizRezervacija[i].Item1<=DateTime.Now)
+                if(NizRezervacija[i]<=DateTime.Now)
                 {
-                    for (int j = i; j < NizRezervacija.Length - 1; i++) NizRezervacija[j] = NizRezervacija[j + 1];
+                    for (int j = i; j < NizRezervacija.Length - 1; i++)
+                    {
+                        NizRezervacija[j] = NizRezervacija[j + 1];
+                        NizRezervacijaStolovi[j] = NizRezervacijaStolovi[j + 1];
+                    }
                     Array.Resize(ref NizRezervacija, NizRezervacija.Length - 1);
+                    Array.Resize(ref NizRezervacijaStolovi, NizRezervacijaStolovi.Length - 1);
                 }
             }
         }
@@ -44,7 +49,7 @@ namespace RestoranMain
 
         }
         //Metoda koja sluzi za ispis dana u izabranom mesecu
-        static void Rezervacija(ref (DateTime, int)[] NizRezervacija)
+        static void Rezervacija(ref DateTime[] NizRezervacija, ref int[] NizRezervacijaStolovi)
         {
             
             //deklaracija promenljivih
@@ -221,7 +226,7 @@ namespace RestoranMain
             }
             for (int i = 0; i < NizRezervacija.Length; i++)
             {
-                if (NizRezervacija[i] == (IzabranoVremeIDatum, UnetiSto))
+                if (NizRezervacija[i] == IzabranoVremeIDatum && UnetiSto== NizRezervacijaStolovi[i])
                 {
                     Console.WriteLine("Ta rezervacija nije dostupna. Unesite 1 ako želite da izmenite rezervaciju ili 2 ako ne želite da pravite rezervaciju");
                     while (!int.TryParse(Console.ReadLine(), out KorisnikJeSiguran) || KorisnikJeSiguran > 3 || KorisnikJeSiguran < 1)
@@ -233,15 +238,17 @@ namespace RestoranMain
             //Petlja koja proverava da li rezervacija već postoji
             if (vracanje) continue;
             Array.Resize(ref NizRezervacija, NizRezervacija.Length + 1);
-            NizRezervacija[NizRezervacija.Length-1] = (IzabranoVremeIDatum, UnetiSto);
+            Array.Resize(ref NizRezervacijaStolovi, NizRezervacijaStolovi.Length + 1);
+            NizRezervacija[NizRezervacija.Length-1] = IzabranoVremeIDatum;
+            NizRezervacijaStolovi[NizRezervacijaStolovi.Length - 1] = UnetiSto;
                 break;
             }
         }
         static void Main(string[] args)
         {
         
-            (DateTime, int)[] NizRezervacija = new (DateTime, int)[0];
-
+            DateTime[] NizRezervacija = new DateTime[0];
+            int[] NizRezervacijaStolovi = new int[0];
             int IzborRezervacija;
             while (true)
             {
@@ -254,19 +261,33 @@ namespace RestoranMain
                 }
                 if (IzborRezervacija == 1)
                 {
-                    IzbaciRezervacijeKojeSuProsle(ref NizRezervacija);
+                    IzbaciRezervacijeKojeSuProsle(ref NizRezervacija, ref NizRezervacijaStolovi);
                     Console.Clear();
                     if (NizRezervacija.Length == 0) Console.WriteLine("Nema rezervacija.");
-                    Array.Sort(NizRezervacija);
+                    for (int j = 0; j <= NizRezervacija.Length - 2; j++)
+                    {
+                        for (int i = 0; i <= NizRezervacija.Length - 2; i++)
+                        {
+                            if (NizRezervacija[i] > NizRezervacija[i + 1])
+                            {
+                                DateTime tempdt = NizRezervacija[i + 1];
+                                int tempint = NizRezervacijaStolovi[i + 1];
+                                NizRezervacija[i + 1] = NizRezervacija[i];
+                                NizRezervacija[i] = tempdt;
+                                NizRezervacijaStolovi[i + 1] = NizRezervacijaStolovi[i];
+                                NizRezervacijaStolovi[i] = tempint;
+                            }
+                        }
+                    }
                     for (int i = 0; i < NizRezervacija.Length; i++)
                         Console.WriteLine((i + 1) 
-                            + ". Datum i vreme: " + NizRezervacija[i].Item1
-                            + " Sto: " + NizRezervacija[i].Item2);
+                            + ". Datum i vreme: " + NizRezervacija[i]
+                            + " Sto: " + NizRezervacijaStolovi[i]);
                 }
                 else
                 {
                     Console.Clear();
-                    Rezervacija(ref NizRezervacija);
+                    Rezervacija(ref NizRezervacija, ref NizRezervacijaStolovi);
                 }
             }
 
